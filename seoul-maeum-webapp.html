@@ -1478,6 +1478,59 @@ function collectData() {
     address: document.getElementById('address').value.trim(),
     household: document.querySelector('input[name="household"]:checked').value,
     visitType: document.querySelector('input[name="visitType"]:checked').value,
+
+    // 추가 조사 항목
+    protection: (() => {
+      const checked = [...document.querySelectorAll('input[name="protection"]:checked')].map(el => el.value);
+      const subs = [...document.querySelectorAll('input[name="protection_sub"]:checked')].map(el => el.value);
+      const etc = document.getElementById('protectionEtc').value.trim();
+      let result = checked.join(', ');
+      if (subs.length) result += ' (' + subs.join('·') + ')';
+      if (etc) result += ', 기타: ' + etc;
+      return result;
+    })(),
+    family: document.querySelector('input[name="family"]:checked')?.value || '',
+    familyContact: (() => {
+      const contact = document.querySelector('input[name="familyContact"]:checked')?.value || '';
+      const methods = [...document.querySelectorAll('input[name="familyMethod"]:checked')].map(el => el.value).join('·');
+      return contact + (methods ? ' (' + methods + ')' : '');
+    })(),
+    economy: document.querySelector('input[name="economy"]:checked')?.value || '',
+    economyType: (() => {
+      const type = document.querySelector('input[name="economyType"]:checked')?.value || '';
+      const etc = document.getElementById('economyEtc').value.trim();
+      return type === '기타' && etc ? '기타: ' + etc : type;
+    })(),
+    housingType: document.querySelector('input[name="housingType"]:checked')?.value || '',
+    housingOwn: (() => {
+      const val = document.querySelector('input[name="housingOwn"]:checked')?.value || '';
+      const etc = document.getElementById('housingOwnEtc').value.trim();
+      return val === '기타' && etc ? '기타: ' + etc : val;
+    })(),
+    housingEnv: (() => {
+      const val = document.querySelector('input[name="housingEnv"]:checked')?.value || '';
+      const etc = document.getElementById('housingEnvEtc').value.trim();
+      return val === '기타' && etc ? '기타: ' + etc : val;
+    })(),
+    health: (() => {
+      const parts = [];
+      if (document.querySelector('input[name="health"]:checked')?.value === '양호') parts.push('양호');
+      if (document.getElementById('hh2').checked) {
+        const v = document.getElementById('healthDisability').value.trim();
+        parts.push('장애' + (v ? '(' + v + ')' : ''));
+      }
+      if (document.getElementById('hh3').checked) {
+        const v = document.getElementById('healthDisease').value.trim();
+        parts.push('질병' + (v ? '(' + v + ')' : ''));
+      }
+      if (document.getElementById('hh4').checked) {
+        const v = document.getElementById('healthEtc').value.trim();
+        parts.push('기타' + (v ? '(' + v + ')' : ''));
+      }
+      return parts.join(', ');
+    })(),
+    serviceIntent: document.querySelector('input[name="serviceIntent"]:checked')?.value || '',
+
     consent_info: consentData.info,
     consent_sensitive: consentData.sensitive,
     consent_promo: consentData.promo,
