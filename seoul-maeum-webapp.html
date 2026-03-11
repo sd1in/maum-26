@@ -1440,18 +1440,19 @@ function calcScores() {
   return { loneliness, isolation, dailyNotOk, lonelyAlert, isolationAlert, dailyAlert };
 }
 
-// ===== 고유번호 생성 (구글시트에서 마지막 번호 조회) =====
+// ===== 고유번호 생성 (앱스크립트에서 발급) =====
 async function generateMemberId() {
   try {
-    const res = await fetch(SHEET_CONFIG.scriptUrl + '?action=lastMemberId');
+    const url = SHEET_CONFIG.scriptUrl + '?action=lastMemberId';
+    const res = await fetch(url, { method: 'GET' });
     const json = await res.json();
     const lastNum = json.lastNum || 0;
     const nextNum = String(lastNum + 1).padStart(4, '0');
     return `SD${nextNum}`;
   } catch (e) {
-    // 조회 실패 시 임시 번호 생성
-    const rand = String(Math.floor(Math.random() * 9000) + 1000);
-    return `SD${rand}`;
+    console.error('회원번호 생성 오류:', e);
+    // 폴백: 타임스탬프 기반
+    return `SD${String(Date.now()).slice(-4)}`;
   }
 }
 
@@ -1731,6 +1732,12 @@ document.getElementById('scanInput').addEventListener('keypress', function(e) {
 
 // ===== 초기화 =====
 updateProgress(1);
+
+// 앱스크립트 연결 테스트
+fetch(SHEET_CONFIG.scriptUrl + '?action=lastMemberId')
+  .then(r => r.json())
+  .then(d => console.log('✅ 앱스크립트 연결 성공, 마지막 번호:', d.lastNum))
+  .catch(e => console.error('❌ 앱스크립트 연결 실패:', e));
 </script>
 </body>
 </html>
