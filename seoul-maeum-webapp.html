@@ -1271,7 +1271,7 @@ let consentData = { info: null, sensitive: null, promo: null, third: null };
 // ===== 구글 시트 설정 (실제 사용 시 교체 필요) =====
 const SHEET_CONFIG = {
   // Google Apps Script Web App URL로 교체하세요
-  scriptUrl: 'https://script.google.com/macros/s/AKfycbxnw3B2PNUCZxjx4ka8Dg0l1BIM5rv0tlG4aCZ7I8gwfXbcJtnEd2l2nsJ_g4AoGEWcKg/exec',
+  scriptUrl: 'https://script.google.com/macros/s/AKfycbwXpnOUu9_3mUl1AbEEjg13akKBJvLWJAB0rYae0FF0aHaPqcW6SuLb5AEhbeVo5--Vzw/exec',
   configured: true
 };
 
@@ -1502,12 +1502,14 @@ async function sendToSheet(data, type) {
     return { success: true, demo: true };
   }
   try {
-    const res = await fetch(SHEET_CONFIG.scriptUrl, {
+    const form = new FormData();
+    form.append('payload', JSON.stringify({ type, ...data }));
+    await fetch(SHEET_CONFIG.scriptUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, ...data })
+      mode: 'no-cors',
+      body: form
     });
-    return await res.json();
+    return { success: true };
   } catch (e) {
     console.error('시트 전송 오류:', e);
     return { success: false };
