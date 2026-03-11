@@ -1271,7 +1271,7 @@ let consentData = { info: null, sensitive: null, promo: null, third: null };
 // ===== 구글 시트 설정 (실제 사용 시 교체 필요) =====
 const SHEET_CONFIG = {
   // Google Apps Script Web App URL로 교체하세요
-  scriptUrl: 'https://script.google.com/macros/s/AKfycbwXpnOUu9_3mUl1AbEEjg13akKBJvLWJAB0rYae0FF0aHaPqcW6SuLb5AEhbeVo5--Vzw/exec',
+  scriptUrl: 'https://script.google.com/macros/s/AKfycbwgF3P8lldbR-_uu4zCb2kATRxef304HB1xYCcQCalYNJxpeznvAv1BBBknKsJ3rO8JXw/exec',
   configured: true
 };
 
@@ -1440,14 +1440,19 @@ function calcScores() {
   return { loneliness, isolation, dailyNotOk, lonelyAlert, isolationAlert, dailyAlert };
 }
 
-// ===== 고유번호 생성 =====
-function generateMemberId() {
-  const now = new Date();
-  const yy = String(now.getFullYear()).slice(2);
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const rand = String(Math.floor(Math.random() * 9000) + 1000);
-  return `SD${yy}${mm}${dd}${rand}`;
+// ===== 고유번호 생성 (구글시트에서 마지막 번호 조회) =====
+async function generateMemberId() {
+  try {
+    const res = await fetch(SHEET_CONFIG.scriptUrl + '?action=lastMemberId');
+    const json = await res.json();
+    const lastNum = json.lastNum || 0;
+    const nextNum = String(lastNum + 1).padStart(4, '0');
+    return `SD${nextNum}`;
+  } catch (e) {
+    // 조회 실패 시 임시 번호 생성
+    const rand = String(Math.floor(Math.random() * 9000) + 1000);
+    return `SD${rand}`;
+  }
 }
 
 // ===== QR 생성 =====
@@ -1464,9 +1469,9 @@ function generateQR(memberId) {
 }
 
 // ===== 데이터 수집 =====
-function collectData() {
+async function collectData() {
   const scores = calcScores();
-  const memberId = generateMemberId();
+  const memberId = await generateMemberId();
 
   userData = {
     memberId,
@@ -1571,7 +1576,7 @@ async function sendToSheet(data, type) {
 
 // ===== 최종 등록 처리 =====
 async function finalizeRegistration() {
-  const { userData: data, scores } = collectData();
+  const { userData: data, scores } = await collectData();
 
   // 로컬 DB 저장 (데모용)
   const db = getDB();
@@ -1666,43 +1671,57 @@ async function processScan() {
   const id = document.getElementById('scanInput').value.trim().toUpperCase();
   if (!id) return;
 
-  const db = getDB();
-  const member = db[id];
-
   document.getElementById('scanError').style.display = 'none';
   document.getElementById('scanResult').classList.remove('show');
-
-  if (!member) {
-    document.getElementById('scanError').style.display = 'block';
-    return;
-  }
-
-  // 방문 횟수 업데이트
-  member.visitCount = (member.visitCount || 1) + 1;
-  member.lastVisit = new Date().toLocaleString('ko-KR');
-  db[id] = member;
-  saveDB(db);
-
-  // 구글 시트에 방문 기록 전송
-  await sendToSheet({
-    memberId: member.memberId,
-    name: member.name,
-    visitCount: member.visitCount,
-    visitAt: member.lastVisit,
-    alert_lonely: member.alert_lonely,
-    alert_isolation: member.alert_isolation,
-    alert_daily: member.alert_daily
-  }, 'visit');
-
-  document.getElementById('scanName').textContent = member.name + ' 님';
-  document.getElementById('scanInfo').innerHTML = `
-    연령대: ${member.age} · ${member.gender}<br>
-    주소: 성동구 ${member.address}<br>
-    가구형태: ${member.household}<br>
-    최초 등록: ${member.registeredAt}
-  `;
-  document.getElementById('visitCount').innerHTML = `🏪 ${member.visitCount}번째 방문`;
+  document.getElementById('scanName').textContent = '';
+  document.getElementById('scanInfo').innerHTML = '<div class="loading-text">⏳ 조회 중...</div>';
   document.getElementById('scanResult').classList.add('show');
+
+  try {
+    // 구글시트에서 회원 조회
+    const res = await fetch(SHEET_CONFIG.scriptUrl + '?memberId=' + encodeURIComponent(id));
+    const json = await res.json();
+
+    if (!json.success || !json.member) {
+      document.getElementById('scanResult').classList.remove('show');
+      document.getElementById('scanError').style.display = 'block';
+      return;
+    }
+
+    const member = json.member;
+    const visitAt = new Date().toLocaleString('ko-KR');
+
+    // 구글시트에 방문 기록 저장
+    const visitCount = (parseInt(member['방문횟수']) || 1) + 1;
+    const form = new FormData();
+    form.append('payload', JSON.stringify({
+      type: 'visit',
+      memberId: id,
+      name: member['성명'],
+      visitCount: visitCount,
+      visitAt: visitAt,
+      alert_lonely: member['외로움판정'] || '',
+      alert_isolation: member['고립판정'] || '',
+      alert_daily: member['일상생활판정'] || ''
+    }));
+    await fetch(SHEET_CONFIG.scriptUrl, { method: 'POST', mode: 'no-cors', body: form });
+
+    // 결과 표시
+    document.getElementById('scanName').textContent = member['성명'] + ' 님';
+    document.getElementById('scanInfo').innerHTML = `
+      연령대: ${member['연령대'] || '-'} · ${member['성별'] || '-'}<br>
+      주소: 성동구 ${member['주소(동)'] || '-'}<br>
+      가구형태: ${member['가구수'] || '-'}<br>
+      최초 등록: ${member['등록일시'] || '-'}
+    `;
+    document.getElementById('visitCount').innerHTML = `🏪 ${visitCount}번째 방문`;
+
+  } catch (e) {
+    document.getElementById('scanResult').classList.remove('show');
+    document.getElementById('scanError').textContent = '조회 중 오류가 발생했습니다.';
+    document.getElementById('scanError').style.display = 'block';
+    console.error('스캔 오류:', e);
+  }
 }
 
 // ===== QR 스캐너 입력 자동 처리 (USB/블루투스 스캐너) =====
