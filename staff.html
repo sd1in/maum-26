@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서울마음편의점 성동 | 직원용</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1A2B4A;
+    --navy-light: #2D4270;
+    --mint: #4CBFA4;
+    --mint-light: #E8F7F3;
+    --mint-dark: #2E9E85;
+    --warm: #F9F6F0;
+    --gray: #6B7280;
+    --gray-light: #F3F4F6;
+    --red: #EF4444;
+    --text: #1F2937;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--navy);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .header-icon {
+    width: 34px; height: 34px;
+    background: var(--mint);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .header-title { font-family: 'Noto Serif KR', serif; font-size: 16px; color: white; font-weight: 600; }
+  .header-badge {
+    background: var(--mint);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .now-time { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+  /* ===== MAIN ===== */
+  .main { padding: 20px 16px 40px; max-width: 500px; margin: 0 auto; }
+
+  /* ===== 탭 ===== */
+  .tab-wrap {
+    display: flex;
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--navy);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  /* ===== 카드 ===== */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== QR 카메라 ===== */
+  .qr-area {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 12px;
+  }
+  #qrVideo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .qr-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-frame {
+    width: 60%; aspect-ratio: 1;
+    border: 3px solid var(--mint);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .qr-frame::before, .qr-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border-color: var(--mint);
+    border-style: solid;
+  }
+  .qr-frame::before { top: -3px; left: -3px; border-width: 4px 0 0 4px; border-radius: 4px 0 0 0; }
+  .qr-frame::after { bottom: -3px; right: -3px; border-width: 0 4px 4px 0; border-radius: 0 0 4px 0; }
+  .qr-scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--mint);
+    animation: scanLine 2s linear infinite;
+    box-shadow: 0 0 8px var(--mint);
+  }
+  @keyframes scanLine {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+  .qr-status {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 12px;
+  }
+  .qr-start-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+  }
+  .qr-start-btn:hover { background: var(--navy-light); }
+  .qr-stop-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--gray-light);
+    color: var(--gray);
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    display: none;
+  }
+
+  /* ===== 입력 영역 ===== */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .main-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--navy);
+    letter-spacing: 1px;
+    transition: border-color 0.2s;
+  }
+  .main-input:focus { outline: none; border-color: var(--mint); }
+  .main-input::placeholder { font-size: 14px; font-weight: 400; letter-spacing: 0; color: #D1D5DB; }
+  .search-btn {
+    padding: 14px 18px;
+    background: var(--mint);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .search-btn:hover { background: var(--mint-dark); }
+
+  /* ===== 검색 결과 ===== */
+  .result-card {
+    background: var(--mint-light);
+    border: 2px solid var(--mint);
+    border-radius: 14px;
+    padding: 18px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .result-card.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-name {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .result-id {
+    font-size: 13px;
+    color: var(--mint-dark);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .result-info {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.9;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+  }
+  .alert-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .alert-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-danger { background: #FEE2E2; color: #DC2626; }
+  .badge-ok { background: #D1FAE5; color: #059669; }
+
+  /* ===== 입장/퇴장 버튼 ===== */
+  .checkin-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .checkin-btn {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .checkin-btn span { font-size: 11px; font-weight: 400; opacity: 0.8; }
+  .btn-enter {
+    background: var(--mint);
+    color: white;
+  }
+  .btn-enter:hover { background: var(--mint-dark); transform: translateY(-2px); }
+  .btn-exit {
+    background: var(--navy);
+    color: white;
+  }
+  .btn-exit:hover { background: var(--navy-light); transform: translateY(-2px); }
+  .btn-enter:disabled, .btn-exit:disabled {
+    opacity: 0.4; cursor: not-allowed; transform: none;
+  }
+
+  /* ===== 이름 검색 결과 목록 ===== */
+  .search-list {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .search-list.show { display: flex; }
+  .search-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--gray-light);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1.5px solid transparent;
+  }
+  .search-list-item:hover { border-color: var(--mint); background: var(--mint-light); }
+  .search-list-name { font-weight: 700; color: var(--navy); font-size: 15px; }
+  .search-list-info { font-size: 12px; color: var(--gray); }
+  .search-list-id { font-size: 12px; color: var(--mint-dark); font-weight: 700; }
+
+  /* ===== 방문 기록 완료 메시지 ===== */
+  .success-msg {
+    text-align: center;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    margin-top: 10px;
+  }
+  .success-msg.enter { background: #D1FAE5; color: #059669; }
+  .success-msg.exit { background: #DBEAFE; color: #1D4ED8; }
+  .success-msg.show { display: block; }
+
+  /* ===== 오늘 방문 현황 ===== */
+  .today-wrap {
+    background: rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 8px;
+  }
+  .today-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 12px;
+  }
+  .today-count {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--mint);
+    font-family: 'Noto Serif KR', serif;
+  }
+  .today-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .today-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .today-item {
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .today-item-name { font-size: 14px; color: white; font-weight: 600; }
+  .today-item-id { font-size: 11px; color: rgba(255,255,255,0.45); }
+  .today-item-time { font-size: 12px; color: var(--mint); font-weight: 700; text-align: right; }
+  .today-item-exit { font-size: 11px; color: rgba(255,255,255,0.45); text-align: right; }
+
+  .error-msg {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+    text-align: center;
+  }
+  .loading-msg {
+    color: var(--gray);
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+    text-align: center;
+  }
+
+  /* 탭 패널 */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">🏪</div>
+    <div>
+      <div class="header-title">서울마음편의점 성동</div>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <span class="header-badge">직원용</span>
+    <span class="now-time" id="nowTime"></span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 탭 -->
+  <div class="tab-wrap">
+    <button class="tab-btn active" onclick="switchTab('qr')">📷 QR스캔</button>
+    <button class="tab-btn" onclick="switchTab('manual')">⌨️ 번호입력</button>
+    <button class="tab-btn" onclick="switchTab('name')">🔍 이름검색</button>
+    <button class="tab-btn" onclick="switchTab('today')">📋 방문현황</button>
+  </div>
+
+  <!-- QR 스캔 탭 -->
+  <div class="tab-panel active" id="tab-qr">
+    <div class="card">
+      <div class="card-title">📷 QR코드 스캔</div>
+      <div class="qr-area" id="qrArea" style="display:none;">
+        <video id="qrVideo" playsinline autoplay muted></video>
+        <div class="qr-overlay">
+          <div class="qr-frame">
+            <div class="qr-scan-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="qr-status" id="qrStatus">카메라를 시작하면 QR코드를 자동으로 인식합니다.</div>
+      <button class="qr-start-btn" id="qrStartBtn" onclick="startQR()">📷 카메라 시작</button>
+      <button class="qr-stop-btn" id="qrStopBtn" onclick="stopQR()">⏹ 카메라 중지</button>
+    </div>
+    <div id="qrResultArea"></div>
+  </div>
+
+  <!-- 번호 입력 탭 -->
+  <div class="tab-panel" id="tab-manual">
+    <div class="card">
+      <div class="card-title">⌨️ 회원번호 입력</div>
+      <div class="input-row">
+        <input class="main-input" id="manualInput" type="text" placeholder="SD0001" maxlength="10"
+          oninput="this.value=this.value.toUpperCase()"
+          onkeypress="if(event.key==='Enter') searchByManual()">
+        <button class="search-btn" onclick="searchByManual()">조회</button>
+      </div>
+      <div class="error-msg" id="manualError">등록되지 않은 회원번호입니다.</div>
+      <div class="loading-msg" id="manualLoading">⏳ 조회 중...</div>
+    </div>
+    <div id="manualResultArea"></div>
+  </div>
+
+  <!-- 이름 검색 탭 -->
+  <div class="tab-panel" id="tab-name">
+    <div class="card">
+      <div class="card-title">🔍 이름 검색</div>
+      <div class="input-row">
+        <input class="main-input" id="nameInput" type="text" placeholder="이름 입력" style="font-size:16px; font-weight:500; letter-spacing:0;"
+          onkeypress="if(event.key==='Enter') searchByName()">
+        <button class="search-btn" onclick="searchByName()">검색</button>
+      </div>
+      <div class="error-msg" id="nameError">검색 결과가 없습니다.</div>
+      <div class="loading-msg" id="nameLoading">⏳ 검색 중...</div>
+      <div class="search-list" id="nameResultList"></div>
+    </div>
+    <div id="nameResultArea"></div>
+  </div>
+
+  <!-- 방문 현황 탭 -->
+  <div class="tab-panel" id="tab-today">
+    <div class="today-wrap">
+      <div class="today-title">📋 오늘의 방문 현황</div>
+      <div class="today-count" id="todayCount">0</div>
+      <div class="today-label">명 방문</div>
+      <div class="today-list" id="todayList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script>
+
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7aEWtAAbPI_40aW1VBBKP99Sj_1oYBjB9FsFAxr6zk5A28p0PcPh_TLtEK_DtdF4FWw/exec';
+
+// ===== 시계 =====
+function updateClock() {
+  document.getElementById('nowTime').textContent = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== 탭 전환 =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'today') loadTodayVisits();
+  if (tab !== 'qr') stopQR();
+}
+
+// ===== 회원 조회 =====
+async function fetchMember(memberId) {
+  const res = await fetch(SCRIPT_URL + '?memberId=' + encodeURIComponent(memberId));
+  const json = await res.json();
+  return json.success ? json.member : null;
+}
+
+async function fetchByName(name) {
+  const res = await fetch(SCRIPT_URL + '?action=searchName&name=' + encodeURIComponent(name));
+  const json = await res.json();
+  return json.success ? json.members : [];
+}
+
+// ===== 방문 기록 저장 =====
+async function saveVisit(member, type) {
+  const now = new Date().toLocaleString('ko-KR');
+  const visitCount = (parseInt(member['방문횟수']) || 0) + (type === 'enter' ? 1 : 0);
+  const form = new FormData();
+  form.append('payload', JSON.stringify({
+    type: 'visit',
+    checkType: type,
+    memberId: member['회원번호'],
+    name: member['성명'],
+    visitCount,
+    visitAt: now,
+    alert_lonely: member['외로움판정'] || '',
+    alert_isolation: member['고립판정'] || '',
+    alert_daily: member['일상생활판정'] || ''
+  }));
+  await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: form });
+
+  // 로컬 방문현황 저장
+  saveTodayLocal(member['회원번호'], member['성명'], type, now);
+}
+
+// ===== 결과 카드 렌더링 =====
+function renderResult(member, targetId) {
+  const target = document.getElementById(targetId);
+  const alerts = [];
+  if (member['외로움판정'] === '도움필요') alerts.push('<span class="alert-badge badge-danger">외로움 도움필요</span>');
+  else alerts.push('<span class="alert-badge badge-ok">외로움 양호</span>');
+  if (member['고립판정'] === '도움필요') alerts.push('<span class="alert-badge badge-danger">고립 도움필요</span>');
+  else alerts.push('<span class="alert-badge badge-ok">고립 양호</span>');
+  if (member['일상생활판정'] === '도움필요') alerts.push('<span class="alert-badge badge-danger">일상생활 도움필요</span>');
+  else alerts.push('<span class="alert-badge badge-ok">일상 양호</span>');
+
+  target.innerHTML = `
+    <div class="result-card show" id="resultCard_${targetId}">
+      <div class="result-name">${member['성명']} 님</div>
+      <div class="result-id">${member['회원번호']} · ${member['연령대'] || ''} · ${member['성별'] || ''}</div>
+      <div class="result-info">
+        📍 성동구 ${member['주소(동)'] || '-'} · ${member['가구수'] || '-'}<br>
+        📞 ${member['연락처'] || '-'}<br>
+        📅 최초 등록: ${member['등록일시'] || '-'}
+      </div>
+      <div class="alert-badges">${alerts.join('')}</div>
+      <div class="checkin-btns">
+        <button class="checkin-btn btn-enter" onclick="doCheckin(${JSON.stringify(member).replace(/"/g, '&quot;')}, 'enter', '${targetId}')">
+          🟢 입장
+          <span id="enterTime_${targetId}"></span>
+        </button>
+        <button class="checkin-btn btn-exit" onclick="doCheckin(${JSON.stringify(member).replace(/"/g, '&quot;')}, 'exit', '${targetId}')">
+          🔵 퇴장
+          <span id="exitTime_${targetId}"></span>
+        </button>
+      </div>
+      <div class="success-msg" id="successMsg_${targetId}"></div>
+    </div>
+  `;
+}
+
+async function doCheckin(member, type, targetId) {
+  const btn = event.target.closest('.checkin-btn');
+  btn.disabled = true;
+  btn.textContent = type === 'enter' ? '⏳ 입장 처리 중...' : '⏳ 퇴장 처리 중...';
+
+  await saveVisit(member, type);
+
+  const now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+  const msg = document.getElementById('successMsg_' + targetId);
+  msg.className = `success-msg ${type} show`;
+  msg.textContent = type === 'enter' ? `✅ 입장 완료 · ${now}` : `✅ 퇴장 완료 · ${now}`;
+
+  btn.textContent = type === 'enter' ? `🟢 입장 (${now})` : `🔵 퇴장 (${now})`;
+  btn.disabled = false;
+}
+
+// ===== 번호 직접 입력 =====
+async function searchByManual() {
+  const id = document.getElementById('manualInput').value.trim().toUpperCase();
+  if (!id) return;
+  document.getElementById('manualError').style.display = 'none';
+  document.getElementById('manualLoading').style.display = 'block';
+  document.getElementById('manualResultArea').innerHTML = '';
+
+  try {
+    const member = await fetchMember(id);
+    document.getElementById('manualLoading').style.display = 'none';
+    if (!member) { document.getElementById('manualError').style.display = 'block'; return; }
+    renderResult(member, 'manualResultArea');
+  } catch (e) {
+    document.getElementById('manualLoading').style.display = 'none';
+    document.getElementById('manualError').style.display = 'block';
+  }
+}
+
+// ===== 이름 검색 =====
+async function searchByName() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) return;
+  document.getElementById('nameError').style.display = 'none';
+  document.getElementById('nameLoading').style.display = 'block';
+  document.getElementById('nameResultList').classList.remove('show');
+  document.getElementById('nameResultArea').innerHTML = '';
+
+  try {
+    const members = await fetchByName(name);
+    document.getElementById('nameLoading').style.display = 'none';
+    if (!members || members.length === 0) { document.getElementById('nameError').style.display = 'block'; return; }
+
+    if (members.length === 1) {
+      renderResult(members[0], 'nameResultArea');
+    } else {
+      const list = document.getElementById('nameResultList');
+      list.innerHTML = members.map((m, i) => `
+        <div class="search-list-item" onclick="selectNameResult(${i})">
+          <div>
+            <div class="search-list-name">${m['성명']}</div>
+            <div class="search-list-info">${m['연령대'] || ''} · ${m['주소(동)'] || ''}동</div>
+          </div>
+          <div class="search-list-id">${m['회원번호']}</div>
+        </div>
+      `).join('');
+      list.classList.add('show');
+      window._nameSearchResults = members;
+    }
+  } catch (e) {
+    document.getElementById('nameLoading').style.display = 'none';
+    document.getElementById('nameError').style.display = 'block';
+  }
+}
+
+function selectNameResult(idx) {
+  document.getElementById('nameResultList').classList.remove('show');
+  renderResult(window._nameSearchResults[idx], 'nameResultArea');
+}
+
+// ===== QR 스캔 =====
+let qrStream = null;
+let qrInterval = null;
+let qrDetected = false;
+
+async function startQR() {
+  qrDetected = false;
+  try {
+    qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.getElementById('qrVideo');
+    video.srcObject = qrStream;
+    document.getElementById('qrArea').style.display = 'block';
+    document.getElementById('qrStartBtn').style.display = 'none';
+    document.getElementById('qrStopBtn').style.display = 'block';
+    document.getElementById('qrStatus').textContent = 'QR코드를 카메라에 갖다 대세요.';
+    document.getElementById('qrResultArea').innerHTML = '';
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    qrInterval = setInterval(() => {
+      if (qrDetected || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && code.data) {
+        qrDetected = true;
+        document.getElementById('qrStatus').textContent = `✅ 인식: ${code.data}`;
+        handleQRResult(code.data);
+      }
+    }, 300);
+
+  } catch (e) {
+    document.getElementById('qrStatus').textContent = '⚠️ 카메라 접근이 거부되었습니다. 권한을 허용해주세요.';
+  }
+}
+
+function stopQR() {
+  if (qrStream) { qrStream.getTracks().forEach(t => t.stop()); qrStream = null; }
+  if (qrInterval) { clearInterval(qrInterval); qrInterval = null; }
+  document.getElementById('qrArea').style.display = 'none';
+  document.getElementById('qrStartBtn').style.display = 'block';
+  document.getElementById('qrStopBtn').style.display = 'none';
+  document.getElementById('qrStatus').textContent = '카메라를 시작하면 QR코드를 자동으로 인식합니다.';
+}
+
+async function handleQRResult(memberId) {
+  stopQR();
+  document.getElementById('qrStatus').textContent = `⏳ ${memberId} 조회 중...`;
+  try {
+    const member = await fetchMember(memberId.trim().toUpperCase());
+    if (!member) {
+      document.getElementById('qrStatus').textContent = '❌ 등록되지 않은 회원번호입니다.';
+      return;
+    }
+    document.getElementById('qrStatus').textContent = `✅ ${member['성명']} 님 조회 완료`;
+    renderResult(member, 'qrResultArea');
+  } catch (e) {
+    document.getElementById('qrStatus').textContent = '⚠️ 조회 중 오류가 발생했습니다.';
+  }
+}
+
+// ===== 오늘 방문 현황 (로컬) =====
+function saveTodayLocal(memberId, name, type, time) {
+  const key = 'visits_' + new Date().toLocaleDateString('ko-KR');
+  let visits = JSON.parse(localStorage.getItem(key) || '[]');
+  const existing = visits.find(v => v.memberId === memberId);
+  if (type === 'enter') {
+    if (!existing) visits.unshift({ memberId, name, enterTime: time, exitTime: '' });
+    else existing.enterTime = time;
+  } else {
+    if (existing) existing.exitTime = time;
+    else visits.unshift({ memberId, name, enterTime: '', exitTime: time });
+  }
+  localStorage.setItem(key, JSON.stringify(visits));
+}
+
+function loadTodayVisits() {
+  const key = 'visits_' + new Date().toLocaleDateString('ko-KR');
+  const visits = JSON.parse(localStorage.getItem(key) || '[]');
+  document.getElementById('todayCount').textContent = visits.filter(v => v.enterTime).length;
+  const list = document.getElementById('todayList');
+  if (visits.length === 0) {
+    list.innerHTML = '<div style="color:rgba(255,255,255,0.4); font-size:13px; text-align:center; padding:20px;">오늘 방문 기록이 없습니다.</div>';
+    return;
+  }
+  list.innerHTML = visits.map(v => `
+    <div class="today-item">
+      <div>
+        <div class="today-item-name">${v.name}</div>
+        <div class="today-item-id">${v.memberId}</div>
+      </div>
+      <div>
+        <div class="today-item-time">🟢 ${v.enterTime ? v.enterTime.split(' ')[1] || v.enterTime : '-'}</div>
+        <div class="today-item-exit">🔵 ${v.exitTime ? v.exitTime.split(' ')[1] || v.exitTime : '퇴장 전'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
